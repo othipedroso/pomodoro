@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Pomodoro</title>
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@500&display=swap" rel="stylesheet">
+</head>
+<style>
+body {
+  font-family: 'Roboto', sans-serif;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  background-color: rgb(107, 107, 107);
+  color: white;
+  text-align: center;
+  transition: background-color 0.5s ease;
+}
+
+#display {
+  font-size: 80px;
+  font-weight: bold;
+  margin: 20px 0;
+}
+
+button {
+  background: #fff;
+  color: #333;
+  border: none;
+  padding: 10px 20px;
+  margin: 5px;
+  font-size: 18px;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: 0.3s;
+}
+
+button:hover {
+  background: #eee;
+  transform: scale(1.05);
+}
+
+.foco { background-color: darkred; }
+.descansoCurto { background-color: darkgreen; }
+.descansoLongo { background-color: darkblue; }
+
+.logo {
+  width: 120px;
+  margin-bottom: 20px;
+}
+
+#estado {
+  font-size: 30px;
+  font-weight: bold;
+  margin-top: 20px;
+}
+</style>
+
+<body>
+  <img src="./tomate.png" alt="Ícone Tomate" class="logo">
+  <h1>Pomodoro Automático 
+  </h1>
+  <p id="display"></p>
+  <p id="estado"></p>
+
+  <!-- Botões -->
+  <button id="pausar">Pausar</button>
+  <button id="resetar">Resetar</button>
+  <button id="pular">Pular Estado</button>
+  
+  <script>
+    // --- VARIÁVEIS INICIAIS ---
+    let tempo = 25 * 60  
+    let ciclos = 0
+    let estadoAtual = "Trabalho"
+    let pausado = false // controla se está pausado
+
+    let display = document.getElementById("display")
+    let estado = document.getElementById("estado")
+
+    // --- FUNÇÃO PARA MOSTRAR O TEMPO ---
+    function atualizarDisplay() {
+      let minutos = Math.floor(tempo / 60)
+      let segundos = tempo % 60
+      display.textContent = minutos + ":" + (segundos < 10 ? "0" + segundos : segundos)
+    }
+
+    // --- FUNÇÃO PARA ATUALIZAR VISUAL ---
+    function atualizarVisual() {
+      if (estadoAtual === "Trabalho") {
+        document.body.className = "foco"
+        estado.textContent = "Hora do Foco!"
+      } else if (estadoAtual === "Descanso curto") {
+        document.body.className = "descansoCurto"
+        estado.textContent = "Descanso Curto - 5 minutos"
+      } else if (estadoAtual === "Descanso longo") {
+        document.body.className = "descansoLongo"
+        estado.textContent = "Descanso Longo - 15 minutos"
+      }
+    }
+
+    // --- MOSTRAR O ESTADO INICIAL ---
+    atualizarDisplay()
+    atualizarVisual()
+
+    // --- LOOP DO POMODORO ---
+    let contador = setInterval(rodarPomodoro, 1000)
+
+    function rodarPomodoro() {
+      if (!pausado) { // só conta se não estiver pausado
+        tempo--
+        atualizarDisplay()
+
+        if (tempo <= 0) {
+          if (estadoAtual === "Trabalho") {
+            ciclos++
+            if (ciclos < 4) {
+              estadoAtual = "Descanso curto"
+              tempo = 5 * 60
+            } else {
+              estadoAtual = "Descanso longo"
+              tempo = 15 * 60
+              ciclos = 0
+            }
+          } else {
+            estadoAtual = "Trabalho"
+            tempo = 25 * 60
+          }
+          atualizarVisual()
+        }
+      }
+    }
+    let botaoPausar = document.getElementById("pausar")
+    // --- BOTÕES (EVENT LISTENERS) ---
+    document.getElementById("pausar").addEventListener("click", function() {
+  pausado = !pausado // troca de true -> false ou false -> true
+
+  // pega o botão pelo DOM
+  let botao = document.getElementById("pausar")
+
+  if (pausado) {
+    botao.textContent = "Continuar"  // se pausado, mostra "Continuar"
+  } else {
+    botao.textContent = "Pausar"     // se rodando, mostra "Pausar"
+  }
+})
+
+    document.getElementById("resetar").addEventListener("click", function() {
+      estadoAtual = "Trabalho"
+      tempo = 25 * 60
+      ciclos = 0
+      atualizarDisplay()
+      atualizarVisual()
+    })
+
+    document.getElementById("pular").addEventListener("click", function() {
+      if (estadoAtual === "Trabalho") {
+        ciclos++
+        estadoAtual = (ciclos < 4) ? "Descanso curto" : "Descanso longo"
+        tempo = (ciclos < 4) ? 5 * 60 : 15 * 60
+        if (ciclos >= 4) ciclos = 0
+      } else {
+        estadoAtual = "Trabalho"
+        tempo = 25 * 60
+      }
+      atualizarDisplay()
+      atualizarVisual()
+    })
+  </script>
+</body>
+</html>
