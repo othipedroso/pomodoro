@@ -1,3 +1,5 @@
+![Screenshot do Pomodoro](./pomodoro.png)
+
 # ⏱️ Pomodoro Automático
 
 Um temporizador Pomodoro feito em **HTML, CSS e JavaScript**, com ciclos automáticos de foco e descanso.
